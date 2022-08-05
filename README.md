@@ -1,46 +1,201 @@
-# Getting Started with Create React App
+# Rock Paper Scissors
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app), using the [Redux](https://redux.js.org/) and [Redux Toolkit](https://redux-toolkit.js.org/) TS template.
 
-## Available Scripts
+## How to play
 
-In the project directory, you can run:
+Build docker image
 
-### `npm start`
+```bash
+docker build -t RPS .
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+For Player ONE
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+```bash
+docker run -p 80:80 RPS
+```
 
-### `npm test`
+For Player TWO
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```bash
+docker run -p 8080:80 RPS
+```
 
-### `npm run build`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## How it works.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Players could add a new game with unlimited counts of rounds or join to an existing one.
+After the player creates a new game he will wait till another player will not join his game.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+If a player will join an existing game, the game immediately starts.
 
-### `npm run eject`
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+## WS Incoming Events
+```javascript
+enum IncomingEvents {
+  GAME_RESPONSE = 'gameResponse',
+  CONNECTED_SUCCESSFULLY = 'connectedSuccessfully',
+  CONNECT = 'connect',
+}
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### IncomingEvents.GAME_RESPONSE
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+Called for any outgoing event, the server always returns a Game response, so we need to listen to only one event: IncomingEvents.GAME_RESPONSE if we want to get a response from Outgoing events.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+```javascript
+{
+  _id: string;
+  roundsCount: number;
+  currentRound: number;
+  players:[{
+      socketId: string;
+      nickName: string;
+      deactivated: string;
+  }];
+  rounds:[
+      roundNumber: number;
+      choices: [
+            userSocket: string;
+            choice: Shapes;
+      ];
+      winner: string;
+  ];
+  paused: boolean;
+  finished: boolean;
+  pausedBy: string;
+}
+```
 
-## Learn More
+### IncomingEvents.CONNECT
+Called to establish a connection.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### IncomingEvents.CONNECTED_SUCCESSFULLY
+Called after a connection was established. Used for saving on client side user's socket ID.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+
+## WS Outgoing Events
+
+```javascript
+enum OutgoingEvents {
+  START_NEW_GAME = 'startNewGame',
+  JOIN_GAME = 'joinGame',
+  MAKE_CHOICE = 'makeChoice',
+  GET_GAMES_LIST = 'getGamesList',
+  MOVE_NEXT_ROUND = 'moveNextRound',
+  PAUSE_GAME = 'pauseGame',
+  RESUME_GAME = 'resumeGame',
+  QUIT_GAME = 'quitGame',
+}
+```
+
+### OutgoingEvents.START_NEW_GAME
+
+#### Request:
+```javascript
+interface StartNewGameMessage {
+    nickName: string;
+    socketId: string;
+    roundsCount: number;
+}
+```
+
+#### Responce:
+See: *IncomingEvents.GAME_RESPONSE*
+
+### OutgoingEvents.JOIN_GAME
+
+#### Request:
+```javascript
+interface JoinNewGameMessage {
+    gameId: string;
+    nickName: string;
+    socketId: string;
+}
+```
+
+#### Responce:
+See: *IncomingEvents.GAME_RESPONSE*
+
+
+### OutgoingEvents.QUIT_GAME
+
+#### Request:
+```javascript 
+interface ExitGameMessage {
+    gameId: string;
+    socketId: string;
+}
+```
+
+#### Responce:
+See: *IncomingEvents.GAME_RESPONSE*
+
+### OutgoingEvents.MAKE_CHOICE
+
+#### Request:
+```javascript
+interface MakeChoiceMessage {
+    gameId: string;
+    socketId: string;
+    choice: Shapes;
+}
+```
+
+#### Responce:
+See: *IncomingEvents.GAME_RESPONSE*
+
+### OutgoingEvents.GET_GAMES_LIST
+
+#### Request:
+none
+
+#### Response:
+Returns array of GameItem
+```javascript
+interface GameItem {
+  id: string;
+  roundsCount: number;
+}
+```
+
+### OutgoingEvents.MOVE_NEXT_ROUND
+
+#### Request:
+```javascript
+interface GotToNextRoundMessage {
+    gameId: string;
+    socketId: string;
+}
+```
+
+#### Responce:
+See: *IncomingEvents.GAME_RESPONSE*
+
+### OutgoingEvents.PAUSE_GAME
+
+#### Request:
+```javascript
+interface GotToNextRoundMessage {
+    gameId: string;
+    socketId: string;
+}
+```
+
+#### Responce:
+See: *IncomingEvents.GAME_RESPONSE*
+
+
+### OutgoingEvents.RESUME_GAME
+
+#### Request:
+```javascript
+interface GotToNextRoundMessage {
+    gameId: string;
+    socketId: string;
+}
+```
+
+#### Responce:
+See: *IncomingEvents.GAME_RESPONSE*
+
