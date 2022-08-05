@@ -8,7 +8,6 @@ export interface ResultModalProps {
     headerText: string;
     bodyText: string;
     btnText: string;
-    // children: React.ReactNode;
 }
 
 function PauseModal({ headerText, bodyText, isShowModal, onBtnClick, isShowBtn, btnText}: ResultModalProps) {
