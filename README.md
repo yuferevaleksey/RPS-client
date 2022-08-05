@@ -1,7 +1,16 @@
-# Rock Paper Scissors
+# Rock Paper Scissors Client side.
 
+```bash
+ git clone https://github.com/yuferevaleksey/RPS-client
+```
+
+```bash
+ cd RPS-client
+```
 
 ## How to play
+
+Be sure that you have already had backend part working, and you could see **Hello world!** in your browser if you open http://localhost:3001
 
 Build docker image
 
@@ -20,6 +29,8 @@ For Player TWO
 ```bash
 docker run -p 8080:80 RPS
 ```
+
+Open the http://localhost in browser tab for first player, and http://localhost:8080 for another player.
 
 
 ## How it works.
