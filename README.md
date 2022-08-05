@@ -15,19 +15,19 @@ Be sure that you have already had backend part working, and you could see **Hell
 Build docker image
 
 ```bash
-docker build -t RPS .
+docker build -t rps .
 ```
 
 For Player ONE
 
 ```bash
-docker run -p 80:80 RPS
+docker run -d -p 80:80 rps
 ```
 
 For Player TWO
 
 ```bash
-docker run -p 8080:80 RPS
+docker run -d -p 8080:80 rps
 ```
 
 Open the http://localhost in browser tab for first player, and http://localhost:8080 for another player.
