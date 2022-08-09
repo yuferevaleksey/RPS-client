@@ -9,6 +9,14 @@ import {
   ResumeGameMessage,
   StartNewGameMessage,
 } from './interfaces/messages';
+import {
+  BODY_TEXT_LOSE_ROUND,
+  BODY_TEXT_WIN_ROUND,
+  BTN_NEXT_TEXT,
+  HEADER_LOSE,
+  HEADER_WIN,
+  NO_ONE_WIN_TEXT
+} from './texts/state-texts';
 
 export enum RoundResult {
   PLAYER_WIN = 'player_win',
@@ -62,14 +70,6 @@ export interface GameItem {
   roundsCount: number;
 }
 
-const NO_ONE_WIN_TEXT = 'Draw!';
-const BTN_NEXT_TEXT = 'Next Round!';
-
-const BODY_TEXT_WIN_ROUND = 'You win Round!';
-const BODY_TEXT_LOSE_ROUND = 'You lose Round!';
-
-const HEADER_WIN = 'Congratulations!';
-const HEADER_LOSE = 'Sorry!';
 
 export interface RoundResultsTexts {
   headerText: string;
@@ -309,7 +309,7 @@ export const {
 } = gameActions;
 
 export default gameSlice.reducer;
-const NO_ONE_WIN = 'noOneWin';
+const TIE = 'TIE';
 
 const getCurrentRoundData = (gameData: Game): GameRound | undefined => {
   return (gameData.rounds || []).find(
@@ -343,7 +343,7 @@ const getRoundResult = (state: GameState, gameData: Game): RoundResult => {
     (round) => round.roundNumber === gameData.currentRound
   )?.winner;
 
-  if (winnResult === NO_ONE_WIN) {
+  if (winnResult === TIE) {
     return RoundResult.NO_ONE_WIN;
   }
 
@@ -462,8 +462,8 @@ const collectReport = (state: GameState): FinishedData => {
         (choice) => choice.userSocket !== state.currentSocketId
       )?.choice,
       result:
-        winner === NO_ONE_WIN
-          ? 'Draw'
+        winner === TIE
+          ? 'TIE!'
           : winner === state.currentSocketId
           ? 'You win!.'
           : 'You lose!.',

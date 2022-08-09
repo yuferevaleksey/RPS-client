@@ -74,6 +74,16 @@ const gameMiddleware: Middleware = (store) => {
         );
       }
 
+      if (gameActions.getGamesList.match(action)) {
+        socket.emit(
+            OutgoingEvents.GET_GAMES_LIST,
+            '',
+            (response: GameItem[]) => {
+              store.dispatch(gameActions.setGamesList({ gameList: response }));
+            }
+        );
+      }
+
       if (gameActions.toggleViewGamesList.match(action)) {
         socket.emit(
           OutgoingEvents.GET_GAMES_LIST,
